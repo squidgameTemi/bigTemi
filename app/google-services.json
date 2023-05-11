@@ -1,0 +1,69 @@
+{
+  "project_info": {
+    "project_number": "56908605070",
+    "firebase_url": "https://temi-bb3c2-default-rtdb.firebaseio.com",
+    "project_id": "temi-bb3c2",
+    "storage_bucket": "temi-bb3c2.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:56908605070:android:dd9a78c04fa2d3c008cbdf",
+        "android_client_info": {
+          "package_name": "com.example.bigTemi"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "56908605070-ce1i6qfbgabp0mvmu7jkunb4rchfvkbb.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBY58F5qby0sOS_oLlkMbrQ1RqhvOoej60"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "56908605070-ce1i6qfbgabp0mvmu7jkunb4rchfvkbb.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:56908605070:android:a6a00bdaa181990308cbdf",
+        "android_client_info": {
+          "package_name": "com.example.smallTemi"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "56908605070-ce1i6qfbgabp0mvmu7jkunb4rchfvkbb.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBY58F5qby0sOS_oLlkMbrQ1RqhvOoej60"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "56908605070-ce1i6qfbgabp0mvmu7jkunb4rchfvkbb.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
