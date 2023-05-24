@@ -8,9 +8,38 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:56908605070:android:dd9a78c04fa2d3c008cbdf",
+        "mobilesdk_app_id": "1:56908605070:android:a3cd2b0c89b5b05108cbdf",
         "android_client_info": {
-          "package_name": "com.example.bigTemi"
+          "package_name": "com.example.bigtemi"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "56908605070-ce1i6qfbgabp0mvmu7jkunb4rchfvkbb.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBY58F5qby0sOS_oLlkMbrQ1RqhvOoej60"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "56908605070-ce1i6qfbgabp0mvmu7jkunb4rchfvkbb.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:56908605070:android:fe86c60344f5a4b008cbdf",
+        "android_client_info": {
+          "package_name": "com.example.mobileTemi"
         }
       },
       "oauth_client": [
