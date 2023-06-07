@@ -8,15 +8,9 @@
     tools:context=".MainActivity">
 
     <ImageView
-        android:id="@+id/big1"
+        android:id="@+id/big"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:src="@drawable/big1" />
-
-    <ImageView
-        android:id="@+id/big2"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:src="@drawable/big2" />
+        android:src="@drawable/big1"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

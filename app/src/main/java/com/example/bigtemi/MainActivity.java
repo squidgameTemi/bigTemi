@@ -8,6 +8,10 @@ import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.os.CountDownTimer;
+import android.view.View;
+import android.widget.ImageView;
+import androidx.appcompat.app.AppCompatActivity;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
@@ -24,33 +28,60 @@ public class MainActivity extends AppCompatActivity implements OnRobotReadyListe
     FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
     DatabaseReference databaseReference = firebaseDatabase.getReference();
     private Robot robot;
+    private ImageView imageView;
     public MainActivity() {this.robot = Robot.getInstance();}
     public Robot getRobot() {return robot;}
-    //private boolean waitForSignal = false;
+
     MediaPlayer mediaPlayer;
-    public int level,player;
-    private boolean signal, player_lose, player_win,gamestart;
+    int level,game,one_win,one_lose,two_win,two_lose;
+    int count = 3;
+    private boolean signal, player_one_win, player_one_lose, player_two_win, player_two_lose, gamestart,stop,count_over;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        databaseReference.child("app").child("start").setValue(0);
-        databaseReference.child("temi").child("loss").setValue(0);
-        databaseReference.child("temi").child("win").setValue(0);
+        imageView = findViewById(R.id.big);
+        databaseReference.child("time_over").setValue(0);
         signal = true;
         gamestart = true;
-        player_lose = false;
-        player_win = false;
-
+        player_one_win = false;
+        player_one_lose = false;
+        player_two_win = false;
+        player_two_lose = false;
+        count_over = false;
+        stop = false;
 
         //temi앱에서 시작버튼을 눌렀을 때(game level에 따라 음성파일이 달라짐) + 조교temi가 탈락자를 처리한 이후
-        databaseReference.child("app/start").addValueEventListener(new ValueEventListener() {
+        databaseReference.child("game").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                playTemiSound();
-                gamestart = false;
+                Object rdata = snapshot.getValue();
+                game = Integer.parseInt(rdata.toString());
+                if(game == 1) {
+                    level = 1;
+                    playTemiSound();
+                    gamestart = false;
+                } else if (game == 2) {
+                    level = 2;
+                    playTemiSound();
+                    gamestart = false;
+                } else if (game == 3) {
+                    level = 3;
+                    playTemiSound();
+                    gamestart = false;
+                } else if (game == 0){
+                    signal = true;
+                    gamestart = true;
+                    player_one_win = false;
+                    player_one_lose = false;
+                    player_two_win = false;
+                    player_two_lose = false;
+                    count_over = false;
+                    stop = false;
+                    count = 3;
+                }
             }
 
             @Override
@@ -59,11 +90,20 @@ public class MainActivity extends AppCompatActivity implements OnRobotReadyListe
             }
         });
 
-        //조교 테미가 탈락자를 처리하고 다시 게임을 진행하는 신호를 줌.
-        databaseReference.child("temi/continue").addValueEventListener(new ValueEventListener() {
+        //조교 temi로 부터 신호가 와서 1번 참가자 승리 음성 출력
+        databaseReference.child("win/one").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                playTemiSound();
+                Object rdata = snapshot.getValue();
+                one_win = Integer.parseInt(rdata.toString());
+                if(one_win == 1){
+                    stop = true;
+                    signal = false;
+                    gamestart = false;
+                    player_one_win = true;
+                    playTemiSound();
+
+                }
             }
 
             @Override
@@ -72,15 +112,19 @@ public class MainActivity extends AppCompatActivity implements OnRobotReadyListe
             }
         });
 
-
-        //조교 temi로 부터 신호가 와서 참가자 탈락 음성 출력
-        databaseReference.child("temi/lose").addValueEventListener(new ValueEventListener() {
+        //조교 temi로 부터 신호가 와서 1번 참가자 탈락 음성 출력
+        databaseReference.child("member/one").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                signal = false;
-                player_lose = true;
-                playTemiSound();
-
+                Object rdata = snapshot.getValue();
+                one_lose = Integer.parseInt(rdata.toString());
+                if(one_lose == 0) {
+                    stop = true;
+                    gamestart = false;
+                    signal = false;
+                    player_one_lose = true;
+                    playTemiSound();
+                }
             }
 
             @Override
@@ -88,16 +132,40 @@ public class MainActivity extends AppCompatActivity implements OnRobotReadyListe
 
             }
         });
-        //조교 temi로 부터 신호가 와서 참가자 승리를 울리고 게임 종료
-        databaseReference.child("temi/win").addValueEventListener(new ValueEventListener() {
+
+        //조교 temi로 부터 신호가 와서 2번 참가자 승리를 울리고 게임 종료
+        databaseReference.child("win/two").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                signal = false;
-                player_win = true;
-                playTemiSound();
-
+                Object rdata = snapshot.getValue();
+                two_win = Integer.parseInt(rdata.toString());
+                if(two_win == 1){
+                    stop = true;
+                    signal = false;
+                    player_two_win = true;
+                    playTemiSound();
+                }
             }
 
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+        //조교 temi로 부터 신호가 와서 2번 참가자 탈락 음성 출력
+        databaseReference.child("member/two").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                Object rdata = snapshot.getValue();
+                two_lose = Integer.parseInt(rdata.toString());
+                if(two_lose == 0){
+                    stop = true;
+                    signal = false;
+                    player_two_lose = true;
+                    playTemiSound();
+                }
+            }
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
 
@@ -106,62 +174,70 @@ public class MainActivity extends AppCompatActivity implements OnRobotReadyListe
     }
 
     private void playTemiSound() {
-        if(gamestart){
+        if (gamestart) {
             mediaPlayer = MediaPlayer.create(MainActivity.this, R.raw.gamestart);
             mediaPlayer.start();
-        }
 
-        while(signal){
-            if(level == 1){
+        }
+        rest(5000);
+
+        while (signal) {
+            if (level == 1) {
                 mediaPlayer = MediaPlayer.create(MainActivity.this, R.raw.one);
+                imageView.setImageResource(R.drawable.big2);
             } else if (level == 2) {
                 mediaPlayer = MediaPlayer.create(MainActivity.this, R.raw.two);
+                imageView.setImageResource(R.drawable.big2);
             } else if (level == 3) {
                 mediaPlayer = MediaPlayer.create(MainActivity.this, R.raw.three);
+                imageView.setImageResource(R.drawable.big2);
+            }
+            if (count == 0) {
+                imageView.setImageResource(R.drawable.big1);
+                count_over = true;
+                break;
             }
             mediaPlayer.start();
+            count--;
 
             /*5초간 파이어베이스를 통해 신호가 오기를 기다리다가 오지 않으면 다시 while loop를 진행.*/
-        }
+            rest(10000);
 
-        if(player_lose){
-            if(player == 1){
-                mediaPlayer = MediaPlayer.create(MainActivity.this, R.raw.one_lose);
-                mediaPlayer.start();
-            } else if (player == 2) {
-                mediaPlayer = MediaPlayer.create(MainActivity.this, R.raw.two_lose);
-                mediaPlayer.start();
+            if (stop) {
+                imageView.setImageResource(R.drawable.big1);
+                break;
             }
-
-        }
-
-        if(player_win){
-            if(player == 1){
-                mediaPlayer = MediaPlayer.create(MainActivity.this, R.raw.one_win);
-                mediaPlayer.start();
-            } else if (player == 2) {
-                mediaPlayer = MediaPlayer.create(MainActivity.this, R.raw.two_win);
-                mediaPlayer.start();
+            if(count == 0){
+                count_over = true;
             }
         }
 
-
-
-        /*
-        // 5초 동안 다른 temi들의 신호를 대기
-        waitForSignal = true;
-        new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                if (waitForSignal) {
-                    // 다른 temi들로부터의 신호가 없는 경우, temi.mp4 음성 출력
-                    playTemiSound();
-                }
-                else{
-
-                }
-            }
-        }, 5000);*/
+        if (player_one_lose) {
+            mediaPlayer = MediaPlayer.create(MainActivity.this, R.raw.one_lose);
+            mediaPlayer.start();
+            player_one_lose = false;
+        }
+        if (player_two_lose) {
+            mediaPlayer = MediaPlayer.create(MainActivity.this, R.raw.two_lose);
+            mediaPlayer.start();
+            player_two_lose = false;
+        }
+        //종료조건
+        if (player_one_win) {
+            mediaPlayer = MediaPlayer.create(MainActivity.this, R.raw.one_win);
+            mediaPlayer.start();
+            player_one_win = false;
+        }
+        if (player_two_win) {
+            mediaPlayer = MediaPlayer.create(MainActivity.this, R.raw.two_win);
+            mediaPlayer.start();
+            player_two_win = false;
+        }
+        if (count_over) {
+            mediaPlayer = MediaPlayer.create(MainActivity.this, R.raw.gameover);
+            mediaPlayer.start();
+            databaseReference.child("time_over").setValue(1);
+        }
     }
     protected void onStart(){
         super.onStart();
@@ -171,6 +247,23 @@ public class MainActivity extends AppCompatActivity implements OnRobotReadyListe
     protected void onStop(){
         super.onStop();
         robot.addOnRobotReadyListener(this);
+    }
+
+    private void rest(int time){
+        CountDownTimer timer = new CountDownTimer(time, 1000) {
+            public void onTick(long millisUntilFinished) {
+                // 아무것도 하지 않음
+            }
+            public void onFinish() {
+            }
+        }.start();
+
+        try {
+            Thread.sleep(time); // 5초간 대기
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        timer.cancel(); // 타이머 취소
     }
 
     public void onRobotReady(boolean isReady){
