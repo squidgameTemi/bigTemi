@@ -106,7 +106,7 @@ public class MainActivity extends AppCompatActivity implements OnRobotReadyListe
                     player_one_lose = false;
                     player_two_win = false;
                     player_two_lose = false;
-                    count = 3;
+                    count = -2;
                 }
                 //시간초과
                 if(count == 0) {
@@ -114,12 +114,14 @@ public class MainActivity extends AppCompatActivity implements OnRobotReadyListe
                     mediaPlayer.start();
                     //조교temi에게 게임종료 신호 전송
                     databaseReference.child("time_over").setValue(1);
+                    databaseReference.child("game").setValue(-1);
                     //아두이노에게도 필요하면 전송
                 }
                 else if(count == -1){
                     //누군가 승리시 게임종료 보이스
                     mediaPlayer = MediaPlayer.create(MainActivity.this, R.raw.player_gameover);
                     mediaPlayer.start();
+                    databaseReference.child("game").setValue(-1);
                 }
             }
 
@@ -246,6 +248,8 @@ public class MainActivity extends AppCompatActivity implements OnRobotReadyListe
             mediaPlayer = MediaPlayer.create(MainActivity.this, R.raw.player_gameover);
             mediaPlayer.start();
             count = -2;
+            databaseReference.child("game").setValue(-1);
+
         }
 
     }
