@@ -78,6 +78,7 @@ public class MainActivity extends AppCompatActivity implements OnRobotReadyListe
                 Object rdata = snapshot.getValue();
                 sensor = Integer.parseInt(rdata.toString());
 
+                System.out.println("count"+count+"sensor"+sensor);
                 if (game == 1 && sensor == 0 && count > 1) {
                     level = 1;
                     playTemiSound();
@@ -112,6 +113,7 @@ public class MainActivity extends AppCompatActivity implements OnRobotReadyListe
                 }
                 //시간초과
                 else if (sensor == 0 && count == 1) {
+                    System.out.println("타임오버임");
                     mediaPlayer = MediaPlayer.create(MainActivity.this, R.raw.gameover);
                     mediaPlayer.start();
                     //조교temi에게 게임종료 신호 전송
@@ -145,16 +147,38 @@ public class MainActivity extends AppCompatActivity implements OnRobotReadyListe
                     gamestart = false;
                     player_one_win = true;
                     count = -1;
+                    databaseReference.child("sensor").setValue(0);
                     GameoverSound();
                 }
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-
             }
         });
 
+        //조교 temi로 부터 신호가 와서 2번 참가자 승리 음성 출력하고 게임 종료
+        databaseReference.child("win/two").
+
+                addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        Object rdata = snapshot.getValue();
+                        two_win = Integer.parseInt(rdata.toString());
+                        if (two_win == 1) {
+                            gamestart = false;
+                            player_two_win = true;
+                            count = -1;
+                            databaseReference.child("sensor").setValue(0);
+                            GameoverSound();
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
 
         //조교 temi로 부터 신호가 와서 1번 참가자 탈락 음성 출력 후 게임 재개
         databaseReference.child("member/one").
@@ -174,29 +198,6 @@ public class MainActivity extends AppCompatActivity implements OnRobotReadyListe
                         }
                         else {
                             player_two_win = false;
-                        }
-                    }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
-
-                    }
-                });
-
-
-        //조교 temi로 부터 신호가 와서 2번 참가자 승리 음성 출력하고 게임 종료
-        databaseReference.child("win/two").
-
-                addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        Object rdata = snapshot.getValue();
-                        two_win = Integer.parseInt(rdata.toString());
-                        if (two_win == 1) {
-                            gamestart = false;
-                            player_two_win = true;
-                            count = -1;
-                            GameoverSound();
                         }
                     }
 
